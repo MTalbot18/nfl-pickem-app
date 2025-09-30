@@ -16,7 +16,7 @@ st.title("🏈 NFL Pickem Login")
 email = st.text_input("Email", key="login_email")
 password = st.text_input("Password", type="password", key="password_signup")
 
-if st.button("Login"):
+if st.button("Login", key="login_button_1"):
     payload = {
         "email": email,
         "password": password,
@@ -45,7 +45,7 @@ st.title("🏈 NFL Pickem Login")
 email = st.text_input("Email", key="signup_email")
 password = st.text_input("Password", type="password", key="login_password")
 
-if st.button("Login"):
+if st.button("Login", key="Login_button_2"):
     try:
         user = st.session_state.auth.sign_in_with_email_and_password(email, password)
         st.success(f"Welcome back, {email}!")
