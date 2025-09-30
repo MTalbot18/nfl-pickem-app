@@ -3,22 +3,42 @@ import requests
 from datetime import datetime, timedelta
 import streamlit as st
 import pyrebase
+import streamlit as st
 
-# Load Firebase config from Streamlit secrets
-firebase_config = {
-    "apiKey": st.secrets["apiKey"],
-    "authDomain": st.secrets["authDomain"],
-    "databaseURL": st.secrets["databaseURL"],
-    "projectId": st.secrets["projectId"],
-    "storageBucket": st.secrets["storageBucket"],
-    "messagingSenderId": st.secrets["messagingSenderId"],
-    "appId": st.secrets["appId"]
-}
+# Firebase config from secrets.toml
+API_KEY = st.secrets["apiKey"]
 
-# Initialize Firebase once
-if "firebase" not in st.session_state:
-    firebase = pyrebase.initialize_app(firebase_config)
-    st.session_state.auth = firebase.auth()
+# Firebase REST endpoint for email/password login
+FIREBASE_AUTH_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}"
+
+# UI
+st.title("🏈 NFL Pickem Login")
+
+email = st.text_input("Email")
+password = st.text_input("Password", type="password")
+
+if st.button("Login"):
+    payload = {
+        "email": email,
+        "password": password,
+        "returnSecureToken": True
+    }
+    try:
+        res = requests.post(FIREBASE_AUTH_URL, json=payload)
+        res.raise_for_status()
+        user_data = res.json()
+        st.success(f"Welcome, {email}!")
+        st.session_state.user = user_data
+    except requests.exceptions.HTTPError as e:
+        error_msg = res.json().get("error", {}).get("message", "Unknown error")
+        st.error(f"Login failed: {error_msg}")
+        st.caption(f"Details: {e}")
+
+# Show user info if logged in
+if "user" in st.session_state:
+    st.write("🔐 Authenticated user info:")
+    st.json(st.session_state.user)
+
 
 # UI: Login form
 st.title("🏈 NFL Pickem Login")
