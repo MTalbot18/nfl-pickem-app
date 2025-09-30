@@ -44,35 +44,6 @@ user = None
 user_id = None
 name = None
 
-# --- Authentication ---
-choice = st.radio("Login or Signup", ["Login", "Signup"])
-email = st.text_input("Email", key="auth_email")
-password = st.text_input("Password", type="password", key="auth_password")
-
-if choice == "Signup":
-    name_input = st.text_input("Your Name")
-    phone_input = st.text_input("Your Phone Number (e.g. +18645551234)")
-    if st.button("Create Account"):
-        try:
-            user = auth.create_user(email=email, password=password)
-            user_id = user.uid
-            db.collection("users").document(user_id).set({
-                "email": email,
-                "name": name_input,
-                "phone": phone_input
-            })
-            name = name_input
-            st.success(f"Account created for {name}!")
-        except Exception as e:
-            st.error(f"Signup failed: {e}")
-
-elif choice == "Login":
-    if st.button("Login"):
-        try:
-            # Firebase Admin SDK doesn't support password-based login
-            st.warning("Login via password is not supported with firebase-admin. Use a custom token or switch to a frontend auth method.")
-        except Exception as e:
-            st.error(f"Login failed: {e}")
 
 # --- Only show game logic if logged in ---
 if user_id and name:
