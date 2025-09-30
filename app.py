@@ -14,8 +14,8 @@ from firebase_admin import credentials, firestore, initialize_app
 # Initialize Firebase Admin SDK (only once)
 if "firebase_admin" not in st.session_state:
     import json
-    cred_dict = st.secrets["firebase_service_account"]  # ✅ correct
-    cred = credentials.Certificate(cred_dict) # Replace with your actual path or use secrets
+    cred_dict = dict(st.secrets["firebase_service_account"])
+    cred = credentials.Certificate(cred_dict)
     app = initialize_app(cred)
     st.session_state.db = firestore.client()
 
