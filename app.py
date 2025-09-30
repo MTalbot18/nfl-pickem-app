@@ -14,7 +14,7 @@ FIREBASE_AUTH_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signInW
 st.title("🏈 NFL Pickem Login")
 
 email = st.text_input("Email", key="login_email")
-password = st.text_input("Password", type="password")
+password = st.text_input("Password", type="password", key="password_signup")
 
 if st.button("Login"):
     payload = {
@@ -43,7 +43,7 @@ if "user" in st.session_state:
 st.title("🏈 NFL Pickem Login")
 
 email = st.text_input("Email", key="signup_email")
-password = st.text_input("Password", type="password")
+password = st.text_input("Password", type="password", key="login_password")
 
 if st.button("Login"):
     try:
