@@ -1,13 +1,44 @@
 import streamlit as st
 import requests
 from datetime import datetime, timedelta
-import pyrebase4 as pyrebase
-from firebase_config import firebase_config
+import streamlit as st
+import pyrebase
 
-# --- Firebase Setup ---
-firebase = pyrebase.initialize_app(firebase_config)
-auth = firebase.auth()
-db = firebase.database()
+# Load Firebase config from Streamlit secrets
+firebase_config = {
+    "apiKey": st.secrets["apiKey"],
+    "authDomain": st.secrets["authDomain"],
+    "databaseURL": st.secrets["databaseURL"],
+    "projectId": st.secrets["projectId"],
+    "storageBucket": st.secrets["storageBucket"],
+    "messagingSenderId": st.secrets["messagingSenderId"],
+    "appId": st.secrets["appId"]
+}
+
+# Initialize Firebase once
+if "firebase" not in st.session_state:
+    firebase = pyrebase.initialize_app(firebase_config)
+    st.session_state.auth = firebase.auth()
+
+# UI: Login form
+st.title("🏈 NFL Pickem Login")
+
+email = st.text_input("Email")
+password = st.text_input("Password", type="password")
+
+if st.button("Login"):
+    try:
+        user = st.session_state.auth.sign_in_with_email_and_password(email, password)
+        st.success(f"Welcome back, {email}!")
+        st.session_state.user = user
+    except Exception as e:
+        st.error("Login failed. Check your credentials or try again.")
+        st.caption(f"Error: {e}")
+
+# Optional: Show user info if logged in
+if "user" in st.session_state:
+    st.write("🔐 Authenticated user info:")
+    st.json(st.session_state.user)
 
 # --- App Logic ---
 api_key = "123"
@@ -25,9 +56,9 @@ if choice == "Signup":
     phone_input = st.text_input("Your Phone Number (e.g. +18645551234)")
     if st.button("Create Account"):
         try:
-            user = auth.create_user_with_email_and_password(email, password)
-            user_id = user["localId"]
-            db.child("users").child(user_id).set({
+            user = auth.create_user(email=email, password=password)
+            user_id = user.uid
+            db.collection("users").document(user_id).set({
                 "email": email,
                 "name": name_input,
                 "phone": phone_input
@@ -40,21 +71,14 @@ if choice == "Signup":
 elif choice == "Login":
     if st.button("Login"):
         try:
-            user = auth.sign_in_with_email_and_password(email, password)
-            user_id = user["localId"]
-            user_info = db.child("users").child(user_id).get()
-            if user_info.val() and "name" in user_info.val():
-                name = user_info.val()["name"]
-                st.success(f"Welcome back, {name}!")
-            else:
-                st.warning("No name found for this account.")
+            # Firebase Admin SDK doesn't support password-based login
+            st.warning("Login via password is not supported with firebase-admin. Use a custom token or switch to a frontend auth method.")
         except Exception as e:
             st.error(f"Login failed: {e}")
 
 # --- Only show game logic if logged in ---
 if user_id and name:
 
-    # --- Utility Functions ---
     def get_current_nfl_week():
         week1_start = datetime(2025, 9, 3)
         today = datetime.today()
@@ -133,7 +157,8 @@ if user_id and name:
         return winners
 
     def submit_picks(user_id, name, picks, mnf_score, week):
-        db.child("picks").child(user_id).push({
+        db.collection("picks").add({
+            "user_id": user_id,
             "week": week,
             "name": name,
             "picks": picks,
@@ -142,20 +167,12 @@ if user_id and name:
         })
 
     def get_user_picks(user_id):
-        user_data = db.child("picks").child(user_id).get()
-        if user_data.each():
-            return [entry.val() for entry in user_data.each()]
-        return []
+        docs = db.collection("picks").where("user_id", "==", user_id).stream()
+        return [doc.to_dict() for doc in docs]
 
     def get_all_picks_for_week(week):
-        all_picks = db.child("picks").get()
-        results = []
-        if all_picks.each():
-            for user in all_picks.each():
-                for entry in user.val().values():
-                    if entry["week"] == week:
-                        results.append(entry)
-        return results
+        docs = db.collection("picks").where("week", "==", week).stream()
+        return [doc.to_dict() for doc in docs]
 
     def score_user_picks_firebase(picks, winners):
         scores = {}
@@ -190,7 +207,6 @@ if user_id and name:
     # --- UI ---
     st.title(f"🏈 NFL Pickem - Week {week}")
 
-    # --- My Picks Dashboard ---
     st.subheader("📋 My Picks")
     user_history = get_user_picks(user_id)
     if user_history:
@@ -203,7 +219,6 @@ if user_id and name:
     else:
         st.info("No picks submitted yet.")
 
-    # --- Pick Submission ---
     st.subheader("📝 Submit Your Picks")
     user_picks = {}
     now = datetime.now()
@@ -218,7 +233,7 @@ if user_id and name:
         st.write(f"Kickoff: {kickoff.strftime('%A %I:%M %p')}")
 
         if now < kickoff:
-                        user_picks[matchup] = st.radio(f"{matchup}", [team1, team2])
+            user_picks[matchup] = st.radio(f"{matchup}", [team1, team2])
         else:
             st.warning(f"⏰ Picks closed for {matchup} (kickoff passed)")
 
@@ -231,8 +246,5 @@ if user_id and name:
         else:
             st.warning("No open games to submit picks for.")
 
-    # --- Leaderboard ---
     st.subheader("🏆 Leaderboard")
-    for i, (player_name, data) in enumerate(ranked, start=1):
-
-        st.write(f"{i}. {player_name} — {data['correct']} correct picks, MNF guess: {data['mnf_guess']}")
+   
