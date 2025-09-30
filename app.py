@@ -46,7 +46,7 @@ name = None
 
 # --- Authentication ---
 choice = st.radio("Login or Signup", ["Login", "Signup"])
-email = st.text_input("Email", Key="auth_email")
+email = st.text_input("Email", key="auth_email")
 password = st.text_input("Password", type="password", key="auth_password")
 
 if choice == "Signup":
