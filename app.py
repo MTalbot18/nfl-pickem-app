@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 from datetime import datetime, timedelta
+from firebase_admin import credentials, firestore, initialize_app, get_apps
 
 # Firebase config from secrets.toml
 API_KEY = st.secrets["apiKey"]
@@ -8,13 +9,10 @@ API_KEY = st.secrets["apiKey"]
 # Firebase REST endpoint for email/password login
 FIREBASE_AUTH_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}"
 
-from firebase_admin import credentials, firestore, initialize_app, get_apps
-
 # Initialize Firebase Admin SDK (only once)
 
 FIREBASE_SIGNUP_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={API_KEY}"
 
-from firebase_admin import credentials, firestore, initialize_app, get_apps
 
 # ✅ Initialize Firebase Admin SDK only once
 if not get_apps():
@@ -56,7 +54,7 @@ if st.button("Submit", key="auth_submit"):
 
         if auth_mode == "Signup":
             st.session_state.name = name_input
-            st.session_state.db.collection("users").document(user_data["localId"]).set({
+            db.collection("users").document(user_data["localId"]).set({
                 "email": email,
                 "name": name_input,
                 "phone": phone_input
@@ -64,7 +62,7 @@ if st.button("Submit", key="auth_submit"):
             st.success(f"Account created for {name_input}!")
         else:
             # Fetch name from Firestore
-            doc = st.session_state.db.collection("users").document(user_data["localId"]).get()
+            doc = db.collection("users").document(user_data["localId"]).get()
             if doc.exists:
                 st.session_state.name = doc.to_dict().get("name", "")
             st.success(f"Welcome back, {st.session_state.name}!")
