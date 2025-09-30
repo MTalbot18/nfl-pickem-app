@@ -8,24 +8,22 @@ API_KEY = st.secrets["apiKey"]
 # Firebase REST endpoint for email/password login
 FIREBASE_AUTH_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}"
 
+from firebase_admin import credentials, firestore, initialize_app, get_apps
 
 # Initialize Firebase Admin SDK (only once)
-if "firebase_admin" not in st.session_state:
-    import json
-    cred_dict = dict(st.secrets["firebase_service_account"])
-    cred = credentials.Certificate(cred_dict)
-    app = initialize_app(cred)
-    st.session_state.db = firestore.client()
 
 FIREBASE_SIGNUP_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={API_KEY}"
 
 from firebase_admin import credentials, firestore, initialize_app, get_apps
 
-
+# ✅ Initialize Firebase Admin SDK only once
 if not get_apps():
     cred_dict = dict(st.secrets["firebase_service_account"])
     cred = credentials.Certificate(cred_dict)
     initialize_app(cred)
+
+# ✅ Create Firestore client
+db = firestore.client()
 
 st.title("🏈 NFL Pickem Auth")
 
