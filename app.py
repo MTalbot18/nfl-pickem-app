@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from datetime import datetime, timedelta
 import firebase_admin
-from firebase_admin import credentials, firestore, initialize_app, get_apps
+from firebase_admin import credentials, firestore, initialize_app
 
 # Firebase config from secrets.toml
 API_KEY = st.secrets["apiKey"]
