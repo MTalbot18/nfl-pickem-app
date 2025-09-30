@@ -15,7 +15,7 @@ FIREBASE_SIGNUP_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signU
 
 
 # ✅ Initialize Firebase Admin SDK only once
-if not get_apps():
+if not firebase_admin._apps:
     cred_dict = dict(st.secrets["firebase_service_account"])
     cred = credentials.Certificate(cred_dict)
     initialize_app(cred)
