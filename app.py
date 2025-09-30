@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 from datetime import datetime, timedelta
-import pyrebase
+import pyrebase4 as pyrebase
 from firebase_config import firebase_config
 
 # --- Firebase Setup ---
@@ -234,4 +234,5 @@ if user_id and name:
     # --- Leaderboard ---
     st.subheader("🏆 Leaderboard")
     for i, (player_name, data) in enumerate(ranked, start=1):
+
         st.write(f"{i}. {player_name} — {data['correct']} correct picks, MNF guess: {data['mnf_guess']}")
