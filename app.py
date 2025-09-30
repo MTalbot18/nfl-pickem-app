@@ -2,8 +2,7 @@ import streamlit as st
 import requests
 from datetime import datetime, timedelta
 import streamlit as st
-import pyrebase
-import streamlit as st
+
 
 # Firebase config from secrets.toml
 API_KEY = st.secrets["apiKey"]
