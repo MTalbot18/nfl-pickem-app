@@ -1,4 +1,5 @@
 streamlit
 pyrebase4
-requests
-pandas
+gcloud==0.18.3
+requests_toolbelt
+oauth2client
