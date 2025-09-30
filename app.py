@@ -9,7 +9,7 @@ API_KEY = st.secrets["apiKey"]
 FIREBASE_AUTH_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}"
 
 # UI
-from firebase_admin import credentials, firestore, initialize_app
+from firebase_admin import credentials, firestore, initialize_app, get_apps
 
 
 if not get_apps():
