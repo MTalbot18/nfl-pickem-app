@@ -1,8 +1,6 @@
 import streamlit as st
 import requests
 from datetime import datetime, timedelta
-import streamlit as st
-
 
 # Firebase config from secrets.toml
 API_KEY = st.secrets["apiKey"]
@@ -11,26 +9,63 @@ API_KEY = st.secrets["apiKey"]
 FIREBASE_AUTH_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}"
 
 # UI
-st.title("🏈 NFL Pickem Login")
+from firebase_admin import credentials, firestore, initialize_app
 
-email = st.text_input("Email", key="login_email")
-password = st.text_input("Password", type="password", key="password_signup")
+# Initialize Firebase Admin SDK (only once)
+if "firebase_admin" not in st.session_state:
+    cred = credentials.Certificate("your-service-account.json")  # Replace with your actual path or use secrets
+    app = initialize_app(cred)
+    st.session_state.db = firestore.client()
 
-if st.button("Login", key="login_button_1"):
+FIREBASE_SIGNUP_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={API_KEY}"
+
+st.title("🏈 NFL Pickem Auth")
+
+auth_mode = st.radio("Choose mode:", ["Login", "Signup"], key="auth_mode")
+
+email = st.text_input("Email", key="auth_email")
+password = st.text_input("Password", type="password", key="auth_password")
+
+if auth_mode == "Signup":
+    name_input = st.text_input("Name", key="signup_name")
+    phone_input = st.text_input("Phone Number (e.g. +18645551234)", key="signup_phone")
+
+if st.button("Submit", key="auth_submit"):
     payload = {
         "email": email,
         "password": password,
         "returnSecureToken": True
     }
+
     try:
-        res = requests.post(FIREBASE_AUTH_URL, json=payload)
+        if auth_mode == "Login":
+            res = requests.post(FIREBASE_AUTH_URL, json=payload)
+        else:
+            res = requests.post(FIREBASE_SIGNUP_URL, json=payload)
+
         res.raise_for_status()
         user_data = res.json()
-        st.success(f"Welcome, {email}!")
         st.session_state.user = user_data
+        st.session_state.user_id = user_data["localId"]
+
+        if auth_mode == "Signup":
+            st.session_state.name = name_input
+            st.session_state.db.collection("users").document(user_data["localId"]).set({
+                "email": email,
+                "name": name_input,
+                "phone": phone_input
+            })
+            st.success(f"Account created for {name_input}!")
+        else:
+            # Fetch name from Firestore
+            doc = st.session_state.db.collection("users").document(user_data["localId"]).get()
+            if doc.exists:
+                st.session_state.name = doc.to_dict().get("name", "")
+            st.success(f"Welcome back, {st.session_state.name}!")
+
     except requests.exceptions.HTTPError as e:
         error_msg = res.json().get("error", {}).get("message", "Unknown error")
-        st.error(f"Login failed: {error_msg}")
+        st.error(f"{auth_mode} failed: {error_msg}")
         st.caption(f"Details: {e}")
 
 # Show user info if logged in
@@ -40,13 +75,11 @@ if "user" in st.session_state:
 
 # --- App Logic ---
 api_key = "123"
-user = None
-user_id = None
-name = None
-
 
 # --- Only show game logic if logged in ---
-if user_id and name:
+if "user_id" in st.session_state and "name" in st.session_state:
+    user_id = st.session_state.user_id
+    name = st.session_state.name
 
     def get_current_nfl_week():
         week1_start = datetime(2025, 9, 3)
