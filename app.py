@@ -11,6 +11,13 @@ FIREBASE_AUTH_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signInW
 # UI
 from firebase_admin import credentials, firestore, initialize_app
 
+
+if not get_apps():
+    cred_dict = dict(st.secrets["firebase_service_account"])
+    cred = credentials.Certificate(cred_dict)
+    initialize_app(cred)
+
+
 # Initialize Firebase Admin SDK (only once)
 if "firebase_admin" not in st.session_state:
     import json
