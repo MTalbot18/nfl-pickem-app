@@ -38,27 +38,6 @@ if "user" in st.session_state:
     st.write("🔐 Authenticated user info:")
     st.json(st.session_state.user)
 
-
-# UI: Login form
-st.title("🏈 NFL Pickem Login")
-
-email = st.text_input("Email", key="signup_email")
-password = st.text_input("Password", type="password", key="login_password")
-
-if st.button("Login", key="Login_button_2"):
-    try:
-        user = st.session_state.auth.sign_in_with_email_and_password(email, password)
-        st.success(f"Welcome back, {email}!")
-        st.session_state.user = user
-    except Exception as e:
-        st.error("Login failed. Check your credentials or try again.")
-        st.caption(f"Error: {e}")
-
-# Optional: Show user info if logged in
-if "user" in st.session_state:
-    st.write("🔐 Authenticated user info:")
-    st.json(st.session_state.user)
-
 # --- App Logic ---
 api_key = "123"
 user = None
