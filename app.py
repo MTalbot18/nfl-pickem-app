@@ -28,13 +28,6 @@ if not firebase_admin._apps:
 # ✅ Create Firestore client
 db = firestore.client()
 
-try:
-    db.collection("test").document("ping").set({"status": "ok"})
-    doc = db.collection("test").document("ping").get()
-    st.success(f"Firestore test passed: {doc.to_dict()}")
-except Exception as e:
-    st.error(f"❌ Firestore test failed: {e}")
-
 # 🔒 Initialize session keys
 for key in ["name", "email", "user_id", "is_logged_in"]:
     if key not in st.session_state:
