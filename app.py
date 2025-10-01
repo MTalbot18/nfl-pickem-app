@@ -99,6 +99,7 @@ if st.session_state.get("user_id") and st.session_state.get("name"):
     # Show game logic here
 else:
     st.warning("Please log in to view game information.")
+    st.stop()  # ⛔ Prevents rest of the script from running
 
     def get_current_nfl_week():
         week1_start = datetime(2025, 9, 3)
