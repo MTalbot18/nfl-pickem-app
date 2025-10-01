@@ -31,6 +31,11 @@ try:
 except Exception as e:
     st.error(f"❌ Firestore test failed: {e}")
 
+# 🔒 Initialize session keys
+for key in ["name", "email", "user_id", "is_logged_in"]:
+    if key not in st.session_state:
+        st.session_state[key] = None
+
 
 st.title("🏈 NFL Pickem Auth")
 
