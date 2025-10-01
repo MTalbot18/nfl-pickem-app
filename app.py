@@ -5,6 +5,9 @@ from zoneinfo import ZoneInfo
 import firebase_admin
 from firebase_admin import credentials, firestore, initialize_app
 
+now_eastern = datetime.now(ZoneInfo("America/New_York"))
+
+
 # Firebase config from secrets.toml
 API_KEY = st.secrets["apiKey"]
 
@@ -128,10 +131,6 @@ if "user_id" in st.session_state and "name" in st.session_state:
             time_str = event.get("strTime")
             if home and away and date_str and time_str:
                 kickoff_dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M:%S")
-                # Attach original timezone if known (e.g., UTC)
-                kickoff_dt = kickoff_dt.replace(tzinfo=ZoneInfo("UTC"))
-                # Convert to Eastern Time
-                eastern_dt = kickoff_dt.astimezone(ZoneInfo("America/New_York"))
                 matchups.append({
                     "matchup": f"{away} vs {home}",
                     "home_logo": home_logo,
