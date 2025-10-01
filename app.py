@@ -82,9 +82,10 @@ if st.button("Submit", key="auth_submit"):
         st.caption(f"Details: {e}")
 
 # Show user info if logged in
-if "user" in st.session_state:
-    st.write("🔐 Authenticated user info:")
-    st.json(st.session_state.user)
+if "name" in st.session_state:
+    st.success(f"Welcome back, {st.session_state.name}!")
+else:
+    st.info("Welcome! Please log in or sign up.")
 
 # --- App Logic ---
 api_key = "123"
