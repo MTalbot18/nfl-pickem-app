@@ -34,7 +34,7 @@ for key in ["name", "email", "user_id", "is_logged_in"]:
         st.session_state[key] = None
 
 
-st.title("🏈 NFL Pickem Auth")
+st.title("🏈 NFL Pickem Login")
 
 auth_mode = st.radio("Choose mode:", ["Login", "Signup"], key="auth_mode")
 
