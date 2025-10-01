@@ -63,8 +63,10 @@ if st.button("Submit", key="auth_submit"):
         st.session_state.user = user_data
         st.session_state.user_id = user_data["localId"]
 
+
         if auth_mode == "Signup":
             st.session_state.name = name_input
+            st.session_state.is_logged_in = True
             db.collection("users").document(user_data["localId"]).set({
                 "email": email,
                 "name": name_input,
@@ -77,6 +79,8 @@ if st.button("Submit", key="auth_submit"):
             if doc.exists:
                 st.session_state.name = doc.to_dict().get("name", "")
             st.success(f"Welcome back, {st.session_state.name}!")
+            st.session_state.is_logged_in = True
+
 
     except requests.exceptions.HTTPError as e:
         error_msg = res.json().get("error", {}).get("message", "Unknown error")
@@ -93,13 +97,14 @@ else:
 api_key = "123"
 
 # --- Only show game logic if logged in ---
-if st.session_state.get("user_id") and st.session_state.get("name"):
+if st.session_state.get("is_logged_in"):
     user_id = st.session_state.user_id
     name = st.session_state.name
     # Show game logic here
 else:
     st.warning("Please log in to view game information.")
-    st.stop()  # ⛔ Prevents rest of the script from running
+    st.stop()
+
 
     def get_current_nfl_week():
         week1_start = datetime(2025, 9, 3)
