@@ -93,9 +93,12 @@ else:
 api_key = "123"
 
 # --- Only show game logic if logged in ---
-if "user_id" in st.session_state and "name" in st.session_state:
+if st.session_state.get("user_id") and st.session_state.get("name"):
     user_id = st.session_state.user_id
     name = st.session_state.name
+    # Show game logic here
+else:
+    st.warning("Please log in to view game information.")
 
     def get_current_nfl_week():
         week1_start = datetime(2025, 9, 3)
