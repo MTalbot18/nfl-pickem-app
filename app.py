@@ -101,10 +101,6 @@ if st.session_state.get("is_logged_in"):
     user_id = st.session_state.user_id
     name = st.session_state.name
     # Show game logic here
-else:
-    st.warning("Please log in to view game information.")
-    st.stop()
-
 
     def get_current_nfl_week():
         week1_start = datetime(2025, 9, 3)
@@ -274,4 +270,8 @@ else:
             st.warning("No open games to submit picks for.")
 
     st.subheader("🏆 Leaderboard")
+
+else:
+    st.warning("Please log in to view game information.")
+    st.stop()
    
