@@ -275,10 +275,10 @@ if st.session_state.get("is_logged_in"):
         st.image(game["home_logo"], width=50)
         st.write(f"Kickoff: {kickoff.strftime('%A %I:%M %p')}")
 
-        if now < kickoff:
-            user_picks[matchup] = st.radio(f"{matchup}", ["Select your Team",team1, team2])
-        else:
-            st.warning(f"⏰ Picks closed for {matchup} (kickoff passed)")
+    if now < kickoff:
+        user_picks[matchup] = st.radio(f"{matchup}", ["Select your Team",team1, team2])
+    else:
+        st.warning(f"⏰ Picks closed for {matchup} (kickoff passed)")
 
     mnf_score = st.number_input("Guess the combined score of Monday Night Football", min_value=0)
 
