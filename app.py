@@ -112,15 +112,12 @@ if st.session_state.get("is_logged_in"):
         delta = today - week1_start
         return max(1, (delta.days // 7) + 1)
 
+    @st.cache_data(ttl=3600)
+
     def get_weekly_matchups(api_key, week, season=2025):
         url = f"https://www.thesportsdb.com/api/v1/json/{api_key}/eventsround.php?id=4391&r={week}&s={season}"
         response = requests.get(url)
-        try:
-            data = response.json()
-        except Exception as e:
-            st.error(f"❌ Failed to parse JSON: {e}")
-            return []
-
+        data = response.json()
         matchups = []
         for event in data.get("events", []):
             home = event.get("strHomeTeam")
@@ -138,6 +135,8 @@ if st.session_state.get("is_logged_in"):
                     "kickoff": kickoff_dt
                 })
         return matchups
+    
+    @st.cache_data(ttl=3600)
 
     def get_mnf_score(api_key, week, season=2025):
         url = f"https://www.thesportsdb.com/api/v1/json/{api_key}/eventsround.php?id=4391&r={week}&s={season}"
@@ -164,6 +163,8 @@ if st.session_state.get("is_logged_in"):
                             "kickoff": game_time.strftime("%I:%M %p")
                         }
         return latest_mnf
+    
+    @st.cache_data(ttl=3600)
 
     def get_week_winners(api_key, week, season=2025):
         url = f"https://www.thesportsdb.com/api/v1/json/{api_key}/eventsround.php?id=4391&r={week}&s={season}"
