@@ -256,7 +256,7 @@ if st.session_state.get("is_logged_in"):
         st.write(f"Kickoff: {kickoff.strftime('%A %I:%M %p')}")
 
         if now < kickoff:
-            user_picks[matchup] = st.radio(f"{matchup}", [team1, team2])
+            user_picks[matchup] = st.radio(f"{matchup}", ["Select your Team",team1, team2])
         else:
             st.warning(f"⏰ Picks closed for {matchup} (kickoff passed)")
 
