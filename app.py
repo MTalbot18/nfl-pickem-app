@@ -290,5 +290,27 @@ else:
     st.warning("Please log in to view game information.")
     st.stop()
 
-st.subheader("🏆 Leaderboard")
-   
+def show_leaderboard(api_key, current_week, actual_mnf_score):
+    st.header(f"🏆 Leaderboard – Week {current_week}")
+
+    # 🔍 Get winners from the API
+    winners = get_week_winners(api_key, current_week)
+
+    if not winners:
+        st.info("No final scores available yet for this week.")
+        return
+
+    # 🔍 Get all picks for the current week
+    weekly_picks = get_all_picks_for_week(current_week)
+
+    if not weekly_picks:
+        st.info("No picks submitted yet for this week.")
+        return
+
+    # ✅ Score and rank users
+    scores = score_user_picks_firebase(weekly_picks, winners)
+    ranked = rank_users(scores, actual_mnf_score)
+
+    # 🏅 Display leaderboard: name and total points
+    for rank, (name, data) in enumerate(ranked, start=1):
+        st.write(f"**{rank}. {name}** — {data['correct']} points")
