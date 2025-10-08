@@ -102,6 +102,8 @@ if st.session_state.get("is_logged_in"):
     name = st.session_state.name
     # Show game logic here
 
+    @st.cache_data(ttl=3600)
+
     def get_current_nfl_week():
         week1_start = datetime(2025, 9, 3)
         today = datetime.today()
