@@ -78,7 +78,7 @@ if st.button("Submit", key="auth_submit"):
             doc = db.collection("users").document(user_data["localId"]).get()
             if doc.exists:
                 st.session_state.name = doc.to_dict().get("name", "")
-            #st.success(f"Welcome back, {st.session_state.name}!")
+            st.success(f"Welcome back, {st.session_state.name}!")
             st.session_state.is_logged_in = True
 
 
@@ -88,10 +88,10 @@ if st.button("Submit", key="auth_submit"):
         st.caption(f"Details: {e}")
 
 # Show user info if logged in
-if "name" in st.session_state:
-    st.success(f"Welcome back, {st.session_state.name}!")
-else:
-    st.info("Welcome! Please log in or sign up.")
+#if "name" in st.session_state:
+   # st.success(f"Welcome back, {st.session_state.name}!")
+#else:
+    #st.info("Welcome! Please log in or sign up.")
 
 # --- App Logic ---
 api_key = "123"
