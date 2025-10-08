@@ -158,7 +158,7 @@ if st.session_state.get("is_logged_in"):
                     if latest_time is None or game_time > latest_time:
                         latest_time = game_time
                         latest_mnf = {
-                            "matchup": f"{away} vs {home}",
+                            "matchup": f"{away} AWAY vs {home} HOME",
                             "score": home_score + away_score,
                             "kickoff": game_time.strftime("%I:%M %p")
                         }
