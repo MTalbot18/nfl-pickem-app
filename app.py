@@ -78,8 +78,8 @@ if st.button("Submit", key="auth_submit"):
             doc = db.collection("users").document(user_data["localId"]).get()
             if doc.exists:
                 st.session_state.name = doc.to_dict().get("name", "")
-            st.success(f"Welcome back, {st.session_state.name}!")
-            st.session_state.is_logged_in = True
+                st.session_state.is_logged_in = True
+                st.success(f"Welcome back, {st.session_state.name}!")
 
 
     except requests.exceptions.HTTPError as e:
