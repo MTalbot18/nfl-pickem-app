@@ -275,7 +275,7 @@ if st.session_state.get("is_logged_in"):
         st.image(game["home_logo"], width=50)
         st.write(f"Kickoff: {kickoff.strftime('%A %I:%M %p')}")
 
-    if now < kickoff:
+    if datetime.now() < kickoff:
         user_picks[matchup] = st.radio(f"{matchup}", ["Select your Team",team1, team2])
     else:
         st.warning(f"⏰ Picks closed for {matchup} (kickoff passed)")
