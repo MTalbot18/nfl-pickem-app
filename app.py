@@ -321,3 +321,40 @@ actual_mnf_score = mnf_score # You can pull this from the API too if available
 
 show_leaderboard(api_key, current_week, actual_mnf_score)
 
+from twilio.rest import Client
+
+TWILIO_ACCOUNT_SID = st.secrets["twilio_account_sid"] 
+TWILIO_AUTH_TOKEN = st.secrets["twilio_auth_token"]
+TWILIO_PHONE_NUMBER = "+17063660133"
+
+
+def send_sms(to_number, message):
+    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    client.messages.create(
+        body=message,
+        from_=TWILIO_PHONE_NUMBER,
+        to=to_number
+    )
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+def send_weekly_reminders():
+    current_week = get_current_nfl_week()
+    users = db.collection("users").stream()
+
+    for user in users:
+        data = user.to_dict()
+        phone = data.get("phone")
+        name = data.get("name")
+
+        if phone:
+            message = (
+            f"Hi {name}, don't forget to submit your NFL picks for Week {current_week} "
+            f"before kickoff! Submit now: https://your-app-url.streamlit.app"
+            )
+
+            send_sms(phone, message)
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(send_weekly_reminders, 'cron', day_of_week='thu', hour=12)  # Adjust time as needed
+scheduler.start()
