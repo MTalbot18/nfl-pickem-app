@@ -180,6 +180,17 @@ if st.session_state.get("is_logged_in"):
         return winners
 
     def submit_picks(user_id, name, picks, mnf_score, week):
+
+        existing = db.collection("picks") \
+            .where("user_id", "==", user_id) \
+            .where("week", "==", week) \
+            .stream()
+
+        if any(existing):
+            st.warning("✅ You've already submitted picks for this week.")
+            return  # ⛔ Exit early, don't resubmit
+
+
         db.collection("picks").add({
             "user_id": user_id,
             "week": week,
@@ -231,20 +242,26 @@ if st.session_state.get("is_logged_in"):
     st.title(f"🏈 NFL Pickem - Week {week}")
 
     st.subheader("📋 My Picks")
-    user_history = get_user_picks(user_id)
-    if user_history:
-        for entry in sorted(user_history, key=lambda x: x["week"], reverse=True):
-            st.write(f"Week {entry['week']}:")
-            for matchup, pick in entry["picks"].items():
-                st.write(f"• {matchup}: {pick}")
-            st.write(f"MNF guess: {entry['mnf_score']}")
-            st.write("---")
-    else:
-        st.info("No picks submitted yet.")
 
-    st.subheader("📝 Submit Your Picks")
-    user_picks = {}
-    now = datetime.now()
+    user_history = get_user_picks(user_id)
+    current_week = get_current_nfl_week()
+
+    current_week_picks = [
+    entry for entry in user_history if entry["week"] == current_week
+]
+
+    if current_week_picks:
+        entry = current_week_picks[0]  # There should only be one
+        st.write(f"Week {entry['week']}:")
+        for matchup, pick in entry["picks"].items():
+            st.write(f"• {matchup}: {pick}")
+        st.write(f"MNF guess: {entry['mnf_score']}")
+    else:
+        st.info("You haven't submitted picks for this week yet.")
+
+        st.subheader("📝 Submit Your Picks")
+        user_picks = {}
+        now = datetime.now()
 
     for game in games:
         matchup = game["matchup"]
@@ -269,9 +286,9 @@ if st.session_state.get("is_logged_in"):
         else:
             st.warning("No open games to submit picks for.")
 
-    st.subheader("🏆 Leaderboard")
-
 else:
     st.warning("Please log in to view game information.")
     st.stop()
+
+st.subheader("🏆 Leaderboard")
    
