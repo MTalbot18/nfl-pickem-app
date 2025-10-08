@@ -263,8 +263,8 @@ if st.session_state.get("is_logged_in"):
         st.info("You haven't submitted picks for this week yet.")
 
         st.subheader("📝 Submit Your Picks")
-        user_picks = {}
-        now = datetime.now()
+    user_picks = {}
+    now = datetime.now()
 
     for game in games:
         matchup = game["matchup"]
@@ -275,7 +275,7 @@ if st.session_state.get("is_logged_in"):
         st.image(game["home_logo"], width=50)
         st.write(f"Kickoff: {kickoff.strftime('%A %I:%M %p')}")
 
-    if datetime.now() < kickoff:
+    if now < kickoff:
         user_picks[matchup] = st.radio(f"{matchup}", ["Select your Team",team1, team2])
     else:
         st.warning(f"⏰ Picks closed for {matchup} (kickoff passed)")
