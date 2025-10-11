@@ -40,7 +40,7 @@ auth_mode = st.radio("Choose mode:", ["Login", "Signup"], key="auth_mode")
 
 email = st.text_input("Email", key="auth_email")
 password = st.text_input("Password", type="password", key="auth_password")
-name_input = st.text_input("Name", key="auth_name")
+
 
 
 if auth_mode == "Signup":
@@ -53,20 +53,8 @@ if st.button("Submit", key="auth_submit"):
         "password": password,
         "returnSecureToken": True
     }
-
-    try:
-        if auth_mode == "Login":
-            res = requests.post(FIREBASE_AUTH_URL, json=payload)
-        else:
-            res = requests.post(FIREBASE_SIGNUP_URL, json=payload)
-
-        res.raise_for_status()
-        user_data = res.json()
-        st.session_state.user = user_data
-        st.session_state.user_id = user_data["localId"]
-        name_input = st.session_state.name
-
-        if auth_mode == "Signup":
+    
+if auth_mode == "Signup":
             st.session_state.name = name_input
             st.session_state.is_logged_in = True
             db.collection("users").document(user_data["localId"]).set({
@@ -75,20 +63,17 @@ if st.button("Submit", key="auth_submit"):
                 "phone": phone_input
             })
             st.success(f"Account created for {name_input}!")
-        else:
+else:
             # Fetch name from Firestore
             doc = db.collection("users").document(user_data["localId"]).get()
-            if doc.exists:
+if doc.exists:
                 #st.session_state.name = doc.to_dict().get("name", "")
                 st.session_state.name = name_input
                 st.session_state.is_logged_in = True
                 st.success(f"Welcome back, {name_input}!")
 
 
-    except requests.exceptions.HTTPError as e:
-        error_msg = res.json().get("error", {}).get("message", "Unknown error")
-        st.error(f"{auth_mode} failed: {error_msg}")
-        st.caption(f"Details: {e}")
+ 
 
 # Show user info if logged in
 #if "name" in st.session_state:
