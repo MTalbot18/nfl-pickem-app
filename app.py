@@ -62,7 +62,7 @@ if st.button("Submit", key="auth_submit"):
         user_data = res.json()
         st.session_state.user = user_data
         st.session_state.user_id = user_data["localId"]
-        st.session_state.name = name_input
+        
 
         if auth_mode == "Signup":
             st.session_state.name = name_input
@@ -72,14 +72,15 @@ if st.button("Submit", key="auth_submit"):
                 "name": name_input,
                 "phone": phone_input
             })
-            st.success(f"Account created for {st.session_state.name}!")
+            st.success(f"Account created for {name_input}!")
         else:
             # Fetch name from Firestore
             doc = db.collection("users").document(user_data["localId"]).get()
             if doc.exists:
-                st.session_state.name = doc.to_dict().get("name", "")
+                #st.session_state.name = doc.to_dict().get("name", "")
+                st.session_state.name = name_input
                 st.session_state.is_logged_in = True
-                st.success(f"Welcome back, {st.session_state.name}!")
+                st.success(f"Welcome back, {name_input}!")
 
 
     except requests.exceptions.HTTPError as e:
