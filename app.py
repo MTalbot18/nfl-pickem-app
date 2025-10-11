@@ -298,6 +298,7 @@ def show_leaderboard(api_key, current_week, actual_mnf_score):
 
     # 🔍 Get winners from the API
     winners = get_week_winners(api_key, current_week)
+    name = data.get("name")
 
     if not winners:
         st.info("No final scores available yet for this week.")
@@ -316,7 +317,7 @@ def show_leaderboard(api_key, current_week, actual_mnf_score):
 
     # 🏅 Display leaderboard: name and total points
     for rank, (name, data) in enumerate(ranked, start=1):
-        st.write(f"**{rank}. {name_input}** — {data['correct']} points")
+        st.write(f"**{rank}. {name}** — {data['correct']} points")
 
 api_key = "123"
 current_week = get_current_nfl_week()
