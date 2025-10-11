@@ -62,7 +62,7 @@ if st.button("Submit", key="auth_submit"):
         user_data = res.json()
         st.session_state.user = user_data
         st.session_state.user_id = user_data["localId"]
-        
+        name_input = st.session_state.name
 
         if auth_mode == "Signup":
             st.session_state.name = name_input
