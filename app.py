@@ -40,6 +40,8 @@ auth_mode = st.radio("Choose mode:", ["Login", "Signup"], key="auth_mode")
 
 email = st.text_input("Email", key="auth_email")
 password = st.text_input("Password", type="password", key="auth_password")
+name_input = st.text_input("Name", key="auth_name")
+
 
 if auth_mode == "Signup":
     name_input = st.text_input("Name", key="signup_name")
