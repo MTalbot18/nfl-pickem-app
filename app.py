@@ -79,7 +79,7 @@ if st.button("Submit", key="auth_submit"):
             if doc.exists:
                 st.session_state.name = doc.to_dict().get("name", "")
                 st.session_state.is_logged_in = True
-                st.success(f"Welcome back, {st.session_state.name}!")
+                st.success(f"Welcome back, {name_input}!")
 
 
     except requests.exceptions.HTTPError as e:
