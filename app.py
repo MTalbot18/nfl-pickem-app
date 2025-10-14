@@ -234,8 +234,8 @@ if st.session_state.get("is_logged_in"):
 
     def rank_users(scores, actual_mnf_score):
         return sorted(scores.items(), key=lambda x: (
-            -x[1]["correct"],
-            abs(x[1]["mnf_guess"] - actual_mnf_score),
+            -int(x[1]["correct"],
+            abs(int(x[1]["mnf_guess"] - int(actual_mnf_score)),
             x[1]["timestamp"]
         ))
 
