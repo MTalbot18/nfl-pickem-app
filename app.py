@@ -41,11 +41,15 @@ auth_mode = st.radio("Choose mode:", ["Login", "Signup"], key="auth_mode")
 email = st.text_input("Email", key="auth_email")
 password = st.text_input("Password", type="password", key="auth_password")
 
-
-
+# Define name and phone inputs only for Signup mode
 if auth_mode == "Signup":
     name_input = st.text_input("Name", key="signup_name")
     phone_input = st.text_input("Phone Number (e.g. +18645551234)", key="signup_phone")
+else:
+    name_input = None
+    phone_input = None
+
+
 
 if st.button("Submit", key="auth_submit"):
     payload = {
@@ -53,25 +57,41 @@ if st.button("Submit", key="auth_submit"):
         "password": password,
         "returnSecureToken": True
     }
-    
-if auth_mode == "Signup":
+
+    if auth_mode == "Signup":
+        response = requests.post(FIREBASE_SIGNUP_URL, json=payload)
+    else:
+        response = requests.post(FIREBASE_AUTH_URL, json=payload)
+
+    if response.status_code == 200:
+        user_data = response.json()
+        user_id = user_data["localId"]
+        st.session_state.user_id = user_id
+        st.session_state.email = email
+
+        if auth_mode == "Signup":
             st.session_state.name = name_input
             st.session_state.is_logged_in = True
-            db.collection("users").document(user_data["localId"]).set({
+
+            db.collection("users").document(user_id).set({
                 "email": email,
                 "name": name_input,
                 "phone": phone_input
             })
-            st.success(f"Account created for {name_input}!")
-else:
-            # Fetch name from Firestore
-            doc = db.collection("users").document(user_data["localId"]).get()
-if doc.exists:
-                #st.session_state.name = doc.to_dict().get("name", "")
-                st.session_state.name = name_input
-                st.session_state.is_logged_in = True
-                st.success(f"Welcome back, {name_input}!")
 
+            st.success(f"Account created for {name_input}!")
+
+        else:
+            doc = db.collection("users").document(user_id).get()
+            if doc.exists:
+                st.session_state.name = doc.to_dict().get("name", "")
+                st.session_state.is_logged_in = True
+                st.success(f"Welcome back, {st.session_state.name}!")
+            else:
+                st.warning("User record not found in Firestore.")
+
+    else:
+        st.error("Authentication failed. Please check your credentials.")
 
  
 
